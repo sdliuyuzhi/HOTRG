@@ -1,0 +1,91 @@
+1. State the problem.
+    We want to write a program to contract two tensor with arbitrary rank and
+dimensions. If the rank is larger than 7(15), one would warn the user and 
+suggest choosing other subroutines to deal with it.
+    We realized that the rank of the tensor must be set in the declaration part
+so that one can only write certain subroutines to contract tensors of certain 
+ranks.
+    One can write subroutins for one specific input/output rank tensors and 
+use a generic interface block to wrap different subroutines up.
+
+2. Define the inputs and outputs.
+    The inputs required by this program are:
+    the two initial tensors 'A' and 'B'( suppose the elements are all real 
+numbers) of certain ranks. 
+    The ranks of the tensors: 'ash', 'bsh'.
+    The indices(a number of array of numbers) to be contracted: 'ain', 'bin'
+    The new order of the contracted tensor 'ABOrder' and 
+    The new shape of the contracted tensor can be defined as 'squeeze'. 
+    Both 'ABOrder' and 'squeeze' can be set as optional argument.
+ 
+    The output is the contracted tensor(with certain rank, order, and shape).
+    and the error output: 'error'.
+
+3. Design the algorithm.
+    This program can be break down into the following major steps:
+    a. permute the tensor A and move the indices to be contracted to the back A(...i)
+    b. permute the tensor B and move the indices to be contracted to the front B(i...)
+    c. reshape the tensor A and B to matrics A(...,i), B(i,...)
+    d. multiply the new matrices T=A(...,i)*B(i,...)
+    d. reshape the matrix T to be the desired tensor with the right shape.
+    e. One has to be careful about the initialization of the ranks and sizes of
+     the arrays.
+
+    The pseudocode for this subroutine is
+    ! permute the tensor A and save it to Anew
+    ! Assume the index to be contracted in A is 'ain'.
+    ! First get the other index 'Aother_index 
+    
+    ! Check to see if the ranks are consistant.
+    error: IF ( ash /= SIZE(SHAPE(A) .OR. bsh /= SIZE(SHAPE(B)) ) THEN
+        error = 1
+        print " The input arrays and ranks are not consistent."
+    ELSE
+        error = 0
+    END IF error
+
+    indexA = (/ (i,i=1,ash)/)               ! index array A
+    indexB = (/ (i,i=1,ash)/)               ! index array B
+    Aother = setdiff( indexA, ain)          ! index not to be contracted in A
+    Bother = setdiff( indexB, bin)          ! index not to be contracted in B
+    Nain = SIZE(ain)                        ! number of index to be contracted in A
+    Nbin = SIZE(bin)                        ! number of index to be contracted in B
+    flagA = ALL( indexA(ash - Nain +1: ash) == ain)
+    flagB = ALL( indexB(: Nbin) == bin)
+
+    ! permute A only when necessary
+    ifA: IF ( .NOT. flagA ) THEN
+        Anew = reshape ( A, SHAPE(A), ORDER = (/Aother, ain/)) ! this is equivalent to permute
+    ELSE
+        Anew = A
+                                                            ! in Matlab 
+    END IF ifA
+
+    ! permute B only when necessary
+    ifB: IF ( .NOT. flagB ) THEN
+        Bnew = reshape ( B, SHAPE(B), ORDER = (/bin, Bother/)) ! this is equivalent to permute
+                                                            ! in Matlab 
+    ELSE 
+        Bnew = B
+    END IF ifB
+
+    Asize = UBOUND(Anew) - LBOUND(Anew)
+    Bsize = UBOUND(Bnew) - LBOUND(Bnew)
+    SefAsize = Asize( ash- Nain+1: ash)
+    SefBsize = Bsize( Nbin +1 : bsh)
+    Asize1 = Asize( 1: ash- Nain)
+    Bsize1 = Bsize( 1: Nbin)
+    ! reshape Anew to be matrix
+    Anew = reshape (Anew, SHAPE = (/PRODUCT(Asize1), PRODUCT(SefAsize)/) )
+    Bnew = reshape (Bnew, SHAPE = (/PRODUCT(SefBsize), PRODUCT(Bsize1)/) )
+
+    prodAB: IF ( PRODUCT(SefAsize) == PRODUCT( SefBsize) )
+        T = reshape ( matmul(Anew,Bnew), (/Asize1, Bsize1/) )     ! may have room for improvement
+                                                            ! by calling the BLAS
+
+    ELSE
+        print " The contracted index is not equal!"
+        error = 2
+    END IF prodAB
+
+

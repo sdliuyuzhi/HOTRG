@@ -1,0 +1,22 @@
+HOTRG
+-----
+This code is a Fortran 90/95 version of the HOTRG code. The code performs renormalization group transformations via tensor contractions.
+
+This code is developed and tested under NERSC Hopper system. The singular value decomposition(SVD) is called from the Intel MKL library.
+
+Information on how to compile and use the components can be directed to yuzhi-liu@uiowa.edu.
+
+# Created by Yuzhi Liu (University of Iowa & FNAL) 2013
+# Copyright (c) 2013-2013 Yuzhi Liu
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version (see <http://www.gnu.org/licenses/>).
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+
