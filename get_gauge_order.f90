@@ -186,6 +186,7 @@ CONTAINS
 
 
     !   Data dictionary: declare calling parameter types & definitions
+    INTEGER :: M, N
     REAL(kind=DBL), INTENT(INOUT), DIMENSION(M,N) :: A
     REAL(kind=DBL), INTENT(OUT), DIMENSION(M,M) :: U
     REAL(kind=DBL), INTENT(OUT), DIMENSION(N,N) :: V
@@ -194,7 +195,7 @@ CONTAINS
     !   Data dictionary: declare local variable types & definitions
     REAL(kind=DBL), DIMENSION(N,N) :: VT
     REAL(kind=DBL), ALLOCATABLE, DIMENSION(:) :: WORK
-    INTEGER :: LDA, LDU, M, N, LWORK, LDVT, INFO
+    INTEGER :: LDA, LDU, LWORK, LDVT, INFO
     CHARACTER :: JOBU, JOBVT
     INTEGER :: istat
     
