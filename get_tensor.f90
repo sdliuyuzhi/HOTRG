@@ -9,7 +9,8 @@ CONTAINS
     !   By Yuzhi Liu on 04/28/2013. V1.
     
     USE set_precisions
-    USE bessel
+    !USE bessel
+    USE amos
     IMPLICIT NONE
 
     
@@ -75,5 +76,50 @@ CONTAINS
     END IF
 
     END FUNCTION Delta
+
+
+    
+    FUNCTION BESSI(NN, X)
+    !   Purpose:
+    !       To calculate the modified Bessel function of the first kind I_NN(X)
+    !  for integer nonnegative order NN and real X.
+    !       It is based on the AMOS subroutines, Algorithm 644. 
+    !       This is realized by setting imaginary part to be zero all the time:
+    !   ZI = 0.0 and set the sequence number to be 1 all the time: N = 1. 
+    !       Reference: http://www.netlib.org/toms/644
+    !   NOTE:  
+    !       Will need to check the constants defined in D1MACH, R1MACH, and I1MACH.
+    !   By Yuzhi Liu 05/06/2013. V1 
+    USE set_precisions
+    USE amos
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: NN
+    REAL(kind=DBL), INTENT(IN) :: X
+    REAL(kind=DBL) :: BESSI
+
+    REAL(kind=DBL) :: ZR, ZI
+    REAL(kind=DBL) :: FNU
+    INTEGER :: KODE  
+    INTEGER :: N
+    REAL(kind=DBL), DIMENSION(1) :: CYR, CYI
+    INTEGER :: NZ
+    INTEGER :: IERR
+    
+    ZR = X
+    ZI = 0.0_DBL
+    FNU = 1.0_DBL*ABS(NN)
+    KODE = 1
+    N = 1
+    CALL ZBESI(ZR, ZI, FNU, KODE, N, CYR, CYI, NZ, IERR)
+    IF (IERR /= 0) THEN
+        WRITE(*,*) 'Check the BESSI function for errors.'
+        WRITE(*,*) 'IERR: ', IERR
+    END IF
+    
+    BESSI = CYR(1)
+
+END FUNCTION BESSI
+
+
 
 END MODULE get_tensor
